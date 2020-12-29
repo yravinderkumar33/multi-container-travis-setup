@@ -1,0 +1,21 @@
+sudo: required
+services:
+  - docker
+
+before_install: 
+  - docker build -t yravinderkumar33/client-test -f ./client/Dockerfile ./client
+
+script:
+  - docker container run yravinderkumar33/client-test npm run test --code-coverage
+
+after_success:
+  - docker build -t yravinderkumar33/client -f ./client/Dockerfile
+  - docker build -t yravinderkumar33/nginx -f ./nginx/Dockerfile
+  - docker build -t yravinderkumar33/server -f ./server/Dockerfile
+  - docker build -t yravinderkumar33/worker -f ./worker/Dockerfile
+  - echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
+  - docker push yravinderkumar33/client
+  - docker push yravinderkumar33/nginx
+  - docker push yravinderkumar33/server
+  - docker push yravinderkumar33/worker
+  - echo "All Images successfully pushed to docker hub"
