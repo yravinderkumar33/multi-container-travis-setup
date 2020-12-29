@@ -10,10 +10,10 @@ before_install:
   - docker build -t yravinderkumar33/client-test -f ./client/Dockerfile.dev ./client
 
 install:
-  - npm install @testing-library/jest-dom react-scripts
+  - npm install nodemon
 
 before_script:
-  - cd ./client
+  - cd ./client && npm install
 
 script:
   - npm run test
@@ -30,3 +30,9 @@ after_success:
   - docker push yravinderkumar33/server
   - docker push yravinderkumar33/worker
   - echo "All Images successfully pushed to docker hub"
+
+after_failure:
+  - echo "Build failed"
+
+after_script:
+  - "after script phase done"
