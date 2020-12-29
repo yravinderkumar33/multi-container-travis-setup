@@ -6,7 +6,7 @@ before_install:
   - docker build -t yravinderkumar33/client-test -f ./client/Dockerfile.dev ./client
 
 script:
-  - docker container run yravinderkumar33/client-test npm run test --code-coverage
+  - docker container run -e CI=true yravinderkumar33/client-test npm run test --code-coverage
 
 after_success:
   - docker build -t yravinderkumar33/client -f ./client/Dockerfile
