@@ -1,4 +1,8 @@
+language: node
+node_js: 
+  - "stable"
 sudo: required
+
 services:
   - docker
 
@@ -6,10 +10,11 @@ before_install:
   - docker build -t yravinderkumar33/client-test -f ./client/Dockerfile.dev ./client
 
 script:
+  - cd ./client && npm run test
   - docker container run -e CI=true yravinderkumar33/client-test npm run test --code-coverage
 
 after_success:
-  - docker build -t yravinderkumar33/client -f ./client/Dockerfile
+  - docker build -t q/client -f ./client/Dockerfile
   - docker build -t yravinderkumar33/nginx -f ./nginx/Dockerfile
   - docker build -t yravinderkumar33/server -f ./server/Dockerfile
   - docker build -t yravinderkumar33/worker -f ./worker/Dockerfile
