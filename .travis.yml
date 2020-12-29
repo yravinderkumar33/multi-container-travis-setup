@@ -9,8 +9,14 @@ services:
 before_install: 
   - docker build -t yravinderkumar33/client-test -f ./client/Dockerfile.dev ./client
 
+install:
+  - npm install @testing-library/jest-dom react-scripts
+
+before_script:
+  - cd ./client
+
 script:
-  - cd ./client && npm run test
+  - npm run test
   - docker container run -e CI=true yravinderkumar33/client-test npm run test --code-coverage
 
 after_success:
