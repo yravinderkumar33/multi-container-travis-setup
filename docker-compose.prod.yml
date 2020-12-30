@@ -1,0 +1,75 @@
+version: "3"
+
+volumes:
+  client:
+
+services:
+  client:
+    ports:
+      - 3000:3000
+    depends_on:
+      - server
+      - worker
+      - postgres
+      - redis
+    stdin_open: true
+    volumes:
+      - /usr/src/app/node_modules
+      - ./client:/usr/src/app
+    build:
+      dockerfile: Dockerfile
+      context: ./client
+
+  server:
+    ports:
+      - 5000:5000
+    depends_on:
+      - redis
+      - postgres
+    environment: 
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      PGUSER: postgres
+      PGHOST: postgres
+      PGDATABASE: postgres
+      PGPASSWORD: password
+      PGPORT: 5432
+    volumes:
+      - /usr/src/app/node_modules
+      - ./server:/usr/src/app
+    build:
+      dockerfile: Dockerfile
+      context: ./server
+
+  worker:
+    depends_on:
+      - redis
+    volumes:
+      - /usr/src/app/node_modules
+      - ./worker:/usr/src/app
+    build:
+      dockerfile: Dockerfile
+      context: ./worker
+    environment: 
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+
+  redis:
+    image: redis:latest
+    restart: always
+
+  postgres:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: password
+
+  nginx: 
+    ports:
+      - 80:80
+    depends_on:
+      - client
+      - server
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
